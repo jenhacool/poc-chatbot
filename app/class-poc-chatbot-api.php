@@ -42,19 +42,19 @@ class POC_Chatbot_API
 
         register_rest_route(
             $this->namespace,
-            '/process_lucky_spin',
+            '/get_sale_page',
             array(
                 'methods' => 'POST',
-                'callback' => array( $this, 'process_lucky_spin' )
+                'callback' => array( $this, 'get_sale_page' )
             )
         );
 
         register_rest_route(
             $this->namespace,
-            '/create_checkout_link',
+            '/gift_checkout_link',
             array(
                 'methods' => 'POST',
-                'callback' => array( $this, 'create_checkout_link' )
+                'callback' => array( $this, 'create_gift_checkout_link' )
             )
         );
     }
