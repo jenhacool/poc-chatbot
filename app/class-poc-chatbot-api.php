@@ -177,7 +177,7 @@ class POC_Chatbot_API
             'client_id' => $params['client_id']
         );
 
-        $settings = unserialize( get_option( 'poc_ahachat_settings' ) );
+        $settings = unserialize( get_option( 'poc_chatbot_settings' ) );
 
         $wincode_setting = null;
 

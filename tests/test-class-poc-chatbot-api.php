@@ -123,7 +123,7 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
             )
         );
 
-        update_option( 'poc_ahachat_settings', serialize( $settings ) );
+        update_option( 'poc_chatbot_settings', serialize( $settings ) );
 
         $body_params = array(
             'wincode' => 'TEST',
