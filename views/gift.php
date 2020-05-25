@@ -33,7 +33,7 @@
                     <div class="form-fields">
                         <div class="form-field">
                             <?php
-                            $json = file_get_contents( POC_AHACHAT_PLUGIN_DIR . 'assets/json/cities.json' );
+                            $json = file_get_contents( POC_CHATBOT_PLUGIN_DIR . 'assets/json/cities.json' );
                             $cities = json_decode( $json, true );
                             ?>
                             <label for="">Tỉnh/Thành phố</label>
