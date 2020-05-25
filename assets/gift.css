@@ -1,0 +1,177 @@
+/* Rest CSS */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+body {
+  line-height: 1;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: "";
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* Checkout CSS */
+* {
+  box-sizing: border-box;
+}
+
+strong {
+  font-weight: 600;
+}
+
+body#poc-chatbot-gift {
+  color: #24292e;
+  font-weight: 400;
+  background: #f6f8fa;
+  font-family: -apple-system, BlinkMacSystemFont, segoe ui, Helvetica, Arial, sans-serif, apple color emoji, segoe ui emoji, segoe ui symbol;
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 50px;
+}
+body#poc-chatbot-gift .container {
+  width: 700px;
+  margin: 0 auto;
+}
+body#poc-chatbot-gift .container .section {
+  width: 100%;
+  background: #fff;
+  padding: 20px;
+  border-radius: 4px;
+}
+body#poc-chatbot-gift .container .section:not(:last-child) {
+  margin-bottom: 20px;
+}
+body#poc-chatbot-gift .container .section h2 {
+  font-size: 22px;
+  margin: 0 0 14px;
+  font-weight: 600;
+}
+body#poc-chatbot-gift .container #customer-info .form-section:not(:last-child) {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e2e6e8;
+}
+body#poc-chatbot-gift .container #customer-info .form-section .form-fields {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+body#poc-chatbot-gift .container #customer-info .form-section .form-fields .form-field {
+  width: 48%;
+  margin-bottom: 10px;
+}
+body#poc-chatbot-gift .container #customer-info .form-section .form-fields .form-field label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+body#poc-chatbot-gift .container #customer-info .form-section .form-fields .form-field label.error {
+  color: #f1564a;
+  text-transform: none;
+  margin-bottom: 0;
+  margin-top: 5px;
+}
+body#poc-chatbot-gift .container #customer-info .form-section .form-fields .form-field input, body#poc-chatbot-gift .container #customer-info .form-section .form-fields .form-field select {
+  border-radius: 4px;
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 14px;
+  box-shadow: none;
+  outline: none;
+  background: #fff;
+  border: 1px solid #d1d5da;
+}
+body#poc-chatbot-gift .container #customer-info .form-section .form-fields .form-field input.error, body#poc-chatbot-gift .container #customer-info .form-section .form-fields .form-field select.error {
+  border-color: #f1564a;
+}
+body#poc-chatbot-gift .container #product-info #product-info-row {
+  display: flex;
+}
+body#poc-chatbot-gift .container #product-info #product-info-row .thumbnail {
+  flex: 0 0 90px;
+  max-width: 90px;
+  margin-right: 10px;
+}
+body#poc-chatbot-gift .container #product-info #product-info-row .thumbnail img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+body#poc-chatbot-gift .container #product-info #product-info-row .info {
+  font-size: 15px;
+}
+body#poc-chatbot-gift .container #product-info #product-info-row .info h3 {
+  font-size: 18px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+body#poc-chatbot-gift .container #product-info #product-info-row .info p {
+  margin-bottom: 4px;
+}
+body#poc-chatbot-gift .container #product-info #product-info-row .info span.free {
+  color: #f1564a;
+  font-weight: 600;
+}
+body#poc-chatbot-gift .container #product-info #product-info-row .info .attributes li {
+  display: inline-block;
+  margin-right: 12px;
+}
+body#poc-chatbot-gift button {
+  border-radius: 4px;
+  padding: 12px 20px;
+  font-size: 14px;
+  text-transform: uppercase;
+  font-weight: 600;
+  border: none;
+  background: #0366d6;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+body#poc-chatbot-gift button:disabled {
+  cursor: no-drop;
+  opacity: 0.5;
+}
+
+/*# sourceMappingURL=gift.css.map */
