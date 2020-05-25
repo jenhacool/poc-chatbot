@@ -130,7 +130,7 @@ class POC_Chatbot_API
 
         set_transient( $transient_key, $transient_data, DAY_IN_SECONDS );
 
-        $url = rtrim( get_home_url(), '/' ) . '/poc_gift/' . $transient_key;
+        $url = rtrim( get_home_url(), '/' ) . '/poc-gift/' . $transient_key;
 
         $body = array(
             'messages' => array(
