@@ -65,7 +65,7 @@ class POC_Chatbot_AJAX
             wp_send_json_error();
         }
 
-        $settings = unserialize( get_option( 'poc_ahachat_settings' ) );
+        $settings = unserialize( get_option( 'poc_chatbot_settings' ) );
 
         $wincode_setting = null;
 
