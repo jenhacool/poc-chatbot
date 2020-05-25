@@ -67,7 +67,7 @@ class POC_Chatbot
      */
     public function add_rewrite_rules()
     {
-        add_rewrite_rule( 'poc-gift/([^/]+)', 'index.php?page=poc_get_gift&customer_key=$matches[1]', 'top' );
+        add_rewrite_rule( 'poc-gift/([^/]+)', 'index.php?pagename=poc_get_gift&customer_key=$matches[1]', 'top' );
     }
 
     /**
@@ -93,7 +93,7 @@ class POC_Chatbot
      */
     public function include_template( $original_template )
     {
-        if( get_query_var( 'customer_key' ) && get_query_var( 'page' ) === 'poc_get_gift' ) {
+        if( get_query_var( 'customer_key' ) && get_query_var( 'pagename' ) === 'poc_get_gift' ) {
             return POC_CHATBOT_PLUGIN_DIR . 'views/gift.php';
         }
 
