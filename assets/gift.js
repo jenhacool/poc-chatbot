@@ -62,7 +62,7 @@ jQuery(document).ready(function() {
                 jQuery('#customer-info, #product-info').remove();
                 jQuery('#result').show();
                 if(response.success) {
-                    jQuery('#result').append('<h2>Thành công !!!</h2><p>Vui lòng kiểm tra email để xem thông tin đơn hàng.</p>');
+                    jQuery('#result').append('<h2>Thành công !!!</h2><p>Vui lòng kiểm tra email để xem thông tin đơn hàng. <a href="https://m.me/492974120811420?ref=.f.5ec8995142209b00124ec073">Link</a></p>');
                 } else {
                     jQuery('#result').append('<h2>Lỗi</h2><p>Vui lòng liên hệ abc@gmail.com để được hỗ trợ</p>');
                 }
