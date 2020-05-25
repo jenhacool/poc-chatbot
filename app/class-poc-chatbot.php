@@ -96,11 +96,7 @@ class POC_Chatbot
         if( get_query_var( 'customer_key' ) && get_query_var( 'page' ) === 'poc_get_gift' ) {
             return POC_CHATBOT_PLUGIN_DIR . 'views/gift.php';
         }
-        var_dump($_GET['customer_key']);
-        set_transient( $_GET['customer_key'], array(
-            'client_id' => '2980042722091199',
-            'wincode' => 'OFF50'
-        ), HOUR_IN_SECONDS );
+
         return $original_template;
     }
 
