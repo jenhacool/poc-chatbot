@@ -23,20 +23,19 @@ class POC_Chatbot_API
 
         register_rest_route(
             $this->namespace,
-            '/products/(?P<id>[a-zA-Z0-9-]+)/attributes',
+            '/get_gift_link',
             array(
                 'methods' => 'POST',
-                'callback' => array( $this, 'get_product_attributes' )
-            ),
-            true
+                'callback' => array( $this, 'get_gift_link' )
+            )
         );
 
         register_rest_route(
             $this->namespace,
-            '/save_info',
+            '/wincode_info',
             array(
                 'methods' => 'POST',
-                'callback' => array( $this, 'save_info' )
+                'callback' => array( $this, 'get_wincode_info' )
             )
         );
 
@@ -161,6 +160,79 @@ class POC_Chatbot_API
         }
 
         return $this->success_response();
+    }
+
+    public function get_gift_link( $request )
+    {
+        $data = array(
+            'first_name' => '',
+            'last_name' => '',
+            'phone_number' => '',
+            'email' => '',
+            'gift_code' => '',
+            'product_id' => '',
+            'client_id' => '',
+            'messenger_url' => ''
+        );
+
+        $params = $request->get_body_params();
+
+        $transient_data = array_merge( $data, $params );
+
+        $transient_key = wp_generate_password( 13, false );
+
+        set_transient( $transient_key, $transient_data, DAY_IN_SECONDS );
+
+        $url = rtrim( get_home_url(), '/' ) . '/poc-gift/' . $transient_key;
+
+        return $this->success_response( array(
+            'link' => $url
+        ) );
+    }
+
+    /**
+     * Get wincode information
+     *
+     * @param \WP_REST_Request $request
+     *
+     * @return \WP_REST_Response
+     */
+    public function get_wincode_info( $request )
+    {
+        $params = $request->get_body_params();
+
+        $data = array(
+            'client_id' => $params['client_id']
+        );
+
+        $settings = unserialize( get_option( 'poc_chatbot_settings' ) );
+
+        $wincode_setting = null;
+
+        foreach( $settings['wincodes'] as $wincode ) {
+            if( $wincode['wincode'] === $params['wincode'] ) {
+                $wincode_setting = $wincode;
+                break;
+            }
+        }
+
+        if( is_null( $wincode_setting ) ) {
+            return $this->error_response();
+        }
+
+        $data = array_merge( $data, $wincode_setting );
+
+        $transient_key = wp_generate_password( 13, false );
+
+        set_transient( $transient_key, $data, HOUR_IN_SECONDS );
+
+        $url = rtrim( $data['link'], '/' ) . '/?customer_key=' . $transient_key;
+
+        return $this->success_response( array(
+            'wincode' => $params['wincode'],
+            'product' => wc_get_product( $wincode_setting['product_id'] )->get_title(),
+            'sale_page' => $url
+        ) );
     }
 
     /**

@@ -18,10 +18,9 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
     public $routes = array(
         '/poc-chatbot/v1/check_gift_code',
         '/poc-chatbot/v1/gift_checkout_link',
+        '/poc-chatbot/v1/get_gift_link',
+        '/poc-chatbot/v1/wincode_info',
         '/poc-chatbot/v1/get_sale_page',
-//        '/poc-chatbot/v1/products/(?P<id>[a-zA-Z0-9-]+)/attributes',
-//        '/poc-chatbot/v1/save_info',
-//        '/poc-chatbot/v1/process_lucky_spin'
     );
 
     public function setUp()
@@ -52,6 +51,8 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
         $wp_rest_server = null;
 
         wp_delete_post( $this->product->get_id() );
+
+        delete_option( 'poc_chatbot_settings' );
     }
 
     public function test_register_routes()
@@ -109,6 +110,85 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
         $response = $this->api->create_gift_checkout_link( $request );
 
         $this->assert_success_response( $response, array() );
+    }
+
+    public function test_get_gift_link()
+    {
+        $data = array(
+            'first_name' => 'Tien',
+            'last_name' => 'Nguyen',
+            'phone_number' => '0788338370',
+            'email' => 'mrtienhp97@gmail.com',
+            'gift_code' => 'haiyenhy',
+            'product_id' => 11,
+            'client_id' => '2980042722091199',
+            'messenger_url' => 'https://m.me/492974120811420'
+        );
+
+        $request = $this->create_new_request( $data );
+
+        $response = $this->api->get_gift_link( $request );
+
+        $this->assertSame( 200, $response->get_status() );
+
+        $response_data = $response->get_data();
+
+        $this->assertTrue( $response_data['success'] );
+
+        $link = $response_data['data']['link'];
+
+        $transient_key = str_replace( rtrim( get_home_url(), '/' ) . '/poc-gift/', '', $link );
+
+        $transient_data = get_transient( $transient_key );
+
+        $this->assertEquals( $data, $transient_data );
+    }
+
+    public function test_get_wincode_info()
+    {
+        $settings = array(
+            'wincodes' => array(
+                array(
+                    'wincode' => 'TEST',
+                    'product_id' => $this->product->get_id(),
+                    'discount' => 10,
+                    'link' => 'http://example.com'
+                )
+            )
+        );
+
+        update_option( 'poc_chatbot_settings', serialize( $settings ) );
+
+        $request = $this->create_new_request( array(
+            'wincode' => 'TEST',
+            'client_id' => '2980042722091199'
+        ) );
+
+        $response = $this->api->get_wincode_info( $request );
+
+        $this->assertSame( 200, $response->get_status() );
+
+        $response_data = $response->get_data();
+
+        $wincode_info = $response_data['data'];
+
+        $this->assertTrue( $response_data['success'] );
+        $this->assertEquals( 'TEST', $wincode_info['wincode'] );
+        $this->assertEquals( $this->product->get_title(), $wincode_info['product'] );
+
+        $sale_page = $wincode_info['sale_page'];
+
+        $transient_key = str_replace( 'http://example.com/?customer_key=', '', $sale_page );
+
+        $transient_data = get_transient( $transient_key );
+
+        $this->assertEquals( array(
+            'client_id' => '2980042722091199',
+            'wincode' => 'TEST',
+            'product_id' => $this->product->get_id(),
+            'discount' => 10,
+            'link' => 'http://example.com'
+        ), $transient_data );
     }
 
     public function test_get_sale_page()
