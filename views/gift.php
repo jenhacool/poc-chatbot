@@ -104,7 +104,8 @@
             'districts': "<?php echo POC_CHATBOT_PLUGIN_URL . 'assets/json/districts.json';?>",
             'wards': "<?php echo POC_CHATBOT_PLUGIN_URL . 'assets/json/wards.json'; ?>",
             'ajax_url': "<?php echo admin_url( 'admin-ajax.php' ); ?>",
-            'ajax_nonce': "<?php echo wp_create_nonce( 'poc-chatbot-ajax-nonce' ); ?>"
+            'ajax_nonce': "<?php echo wp_create_nonce( 'poc-chatbot-ajax-nonce' ); ?>",
+            'messenger_url': "<?php echo $data['messenger_url']; ?>"
         };
     </script>
     <script src="<?php echo POC_CHATBOT_PLUGIN_URL . 'assets/jquery.js'; ?>"></script>

@@ -119,7 +119,8 @@ class POC_Chatbot_API
             'email' => '',
             'gift_code' => '',
             'product_id' => '',
-            'client_id' => ''
+            'client_id' => '',
+            'messenger_url' => ''
         );
 
         $params = $request->get_body_params();

@@ -102,7 +102,8 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
             'email' => 'mrtienhp97@gmail.com',
             'gift_code' => 'haiyenhy',
             'product_id' => 11,
-            'client_id' => '2980042722091199'
+            'client_id' => '2980042722091199',
+            'messenger_url' => 'https://m.me/492974120811420'
         ) );
 
         $response = $this->api->create_gift_checkout_link( $request );
