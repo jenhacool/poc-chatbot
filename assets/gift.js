@@ -8,10 +8,6 @@ jQuery(document).ready(function() {
             first_name: 'required',
             last_name: 'required',
             phone_number: 'required',
-            email: {
-                required: true,
-                email: true
-            }
         }
     });
 
