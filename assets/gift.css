@@ -144,9 +144,15 @@ body#poc-chatbot-gift .container #product-info #product-info-row {
   display: flex;
 }
 body#poc-chatbot-gift .container #product-info #product-info-row .thumbnail {
-  flex: 0 0 90px;
-  max-width: 90px;
   margin-right: 10px;
+  flex: 0 0 60px;
+  max-width: 60px;
+}
+@media (min-width: 768px) {
+  body#poc-chatbot-gift .container #product-info #product-info-row .thumbnail {
+    flex: 0 0 90px;
+    max-width: 90px;
+  }
 }
 body#poc-chatbot-gift .container #product-info #product-info-row .thumbnail img {
   width: 100%;

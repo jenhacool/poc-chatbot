@@ -150,9 +150,14 @@ body#poc-chatbot-gift {
         display: flex;
 
         .thumbnail {
-          flex: 0 0 90px;
-          max-width: 90px;
           margin-right: 10px;
+          flex: 0 0 60px;
+          max-width: 60px;
+
+          @media (min-width: 768px) {
+            flex: 0 0 90px;
+            max-width: 90px;
+          }
 
           img {
             width: 100%;
