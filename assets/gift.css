@@ -65,11 +65,21 @@ body#poc-chatbot-gift {
   font-family: -apple-system, BlinkMacSystemFont, segoe ui, Helvetica, Arial, sans-serif, apple color emoji, segoe ui emoji, segoe ui symbol;
   font-size: 16px;
   line-height: 1.5;
-  padding: 50px;
+  padding: 20px;
+}
+@media (min-width: 768px) {
+  body#poc-chatbot-gift {
+    padding: 50px;
+  }
 }
 body#poc-chatbot-gift .container {
-  width: 700px;
   margin: 0 auto;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  body#poc-chatbot-gift .container {
+    width: 700px;
+  }
 }
 body#poc-chatbot-gift .container .section {
   width: 100%;
@@ -96,8 +106,13 @@ body#poc-chatbot-gift .container #customer-info .form-section .form-fields {
   flex-wrap: wrap;
 }
 body#poc-chatbot-gift .container #customer-info .form-section .form-fields .form-field {
-  width: 48%;
   margin-bottom: 10px;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  body#poc-chatbot-gift .container #customer-info .form-section .form-fields .form-field {
+    width: 48%;
+  }
 }
 body#poc-chatbot-gift .container #customer-info .form-section .form-fields .form-field label {
   display: block;

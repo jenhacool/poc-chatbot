@@ -59,11 +59,19 @@ body#poc-chatbot-gift {
   font-family: -apple-system, BlinkMacSystemFont, segoe ui, Helvetica, Arial, sans-serif, apple color emoji, segoe ui emoji, segoe ui symbol;
   font-size: 16px;
   line-height: 1.5;
-  padding: 50px;
+  padding: 20px;
+
+  @media (min-width: 768px) {
+    padding: 50px;
+  }
 
   .container {
-    width: 700px;
     margin: 0 auto;
+    width: 100%;
+
+    @media (min-width: 768px) {
+      width: 700px;
+    }
 
     .section {
       width: 100%;
@@ -96,8 +104,12 @@ body#poc-chatbot-gift {
           flex-wrap: wrap;
 
           .form-field {
-            width: 48%;
             margin-bottom: 10px;
+            width: 100%;
+
+            @media (min-width: 768px) {
+              width: 48%;
+            }
 
             label {
               display: block;
