@@ -230,6 +230,7 @@ class POC_Chatbot_API
 
         return $this->success_response( array(
             'wincode' => $params['wincode'],
+            'discount' => $wincode_setting['discount'],
             'product' => wc_get_product( $wincode_setting['product_id'] )->get_title(),
             'sale_page' => $url
         ) );

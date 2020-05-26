@@ -174,6 +174,7 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
 
         $this->assertTrue( $response_data['success'] );
         $this->assertEquals( 'TEST', $wincode_info['wincode'] );
+        $this->assertEquals( 10, $wincode_info['discount'] );
         $this->assertEquals( $this->product->get_title(), $wincode_info['product'] );
 
         $sale_page = $wincode_info['sale_page'];
