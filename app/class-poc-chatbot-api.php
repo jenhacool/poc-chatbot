@@ -69,7 +69,7 @@ class POC_Chatbot_API
     {
         $this->validate_request( $request );
 
-        $params = $request->get_body_params();
+        $params = $request->get_json_params();
 
         if( ! isset( $params['gift_code'] ) ) {
             return $this->error_response( array(
@@ -122,7 +122,7 @@ class POC_Chatbot_API
             'messenger_url' => ''
         );
 
-        $params = $request->get_body_params();
+        $params = $request->get_json_params();
 
         $transient_data = array_merge( $data, $params );
 
@@ -182,7 +182,7 @@ class POC_Chatbot_API
             'messenger_url' => ''
         );
 
-        $params = $request->get_body_params();
+        $params = $request->get_json_params();
 
         $transient_data = array_merge( $data, $params );
 
@@ -206,7 +206,7 @@ class POC_Chatbot_API
      */
     public function get_wincode_info( $request )
     {
-        $params = $request->get_body_params();
+        $params = $request->get_json_params();
 
         $data = array(
             'client_id' => $params['client_id']
@@ -252,7 +252,7 @@ class POC_Chatbot_API
      */
     public function get_sale_page( $request )
     {
-        $params = $request->get_body_params();
+        $params = $request->get_json_params();
 
         $data = array(
             'client_id' => $params['client_id']
