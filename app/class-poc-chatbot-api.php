@@ -162,6 +162,13 @@ class POC_Chatbot_API
         return $this->success_response();
     }
 
+    /**
+     * Get gift link
+     *
+     * @param \WP_REST_Request $request
+     *
+     * @return \WP_REST_Response
+     */
     public function get_gift_link( $request )
     {
         $data = array(
