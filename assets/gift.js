@@ -13,7 +13,6 @@ jQuery(document).ready(function() {
 
     jQuery.extend(jQuery.validator.messages, {
         required: "Vui lòng điền thông tin.",
-        email: "Email không đúng. Vui lòng kiểm tra lại."
     });
 
     jQuery('#city').on('change', function () {
@@ -58,7 +57,7 @@ jQuery(document).ready(function() {
                 jQuery('#customer-info, #product-info').remove();
                 jQuery('#result').show();
                 if(response.success) {
-                    jQuery('#result').append('<h2>Thành công !!!</h2><p>Vui lòng kiểm tra email để xem thông tin đơn hàng. <a href="'+poc_chatbot.messenger_url+'">Link</a></p>');
+                    jQuery('#result').append('<h2>Thành công !!!</h2><p>Vui lòng kiểm tra email để xem thông tin đơn hàng.</p><p>Chúng tôi đang có chương trình vòng quay may mắn với nhiều phần quà hấp dẫn. Nhấn <a href="'+poc_chatbot.messenger_url+'">vào đây</a> để tham gia</p>');
                 } else {
                     jQuery('#result').append('<h2>Lỗi</h2><p>Vui lòng liên hệ abc@gmail.com để được hỗ trợ</p>');
                 }
