@@ -16,6 +16,7 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
     public $server;
 
     public $routes = array(
+        '/poc-chatbot/v1/redirect_to_block',
         '/poc-chatbot/v1/check_gift_code',
         '/poc-chatbot/v1/gift_checkout_link',
         '/poc-chatbot/v1/get_gift_link',
@@ -221,6 +222,20 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
         $this->assert_success_response( $response, array() );
     }
 
+    public function test_redirect_to_block()
+    {
+        $request = $this->create_new_request( array(
+            'block' => '5ecf27049a11d800131d75a2',
+            'client_id' => '3843621259012589'
+        ) );
+
+        $response = $this->api->redirect_to_block( $request );
+
+        var_dump($response);
+
+        $this->assert_success_response( $response, array() );
+    }
+
     /**
      * Create new REST Request
      *
@@ -234,7 +249,9 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
 
         $request->set_header( 'X-POC-Access-Token', '8wdT9UsxXd' );
 
-        $request->set_body_params( $data );
+        $request->set_header( 'Content-Type', 'application/json' );
+
+        $request->set_body( json_encode( $data ) );
 
         return $request;
     }
