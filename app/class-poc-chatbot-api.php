@@ -14,15 +14,6 @@ class POC_Chatbot_API
     {
         register_rest_route(
             $this->namespace,
-            '/redirect_to_block',
-            array(
-                'methods' => 'POST',
-                'callback' => array( $this, 'redirect_to_block' )
-            )
-        );
-
-        register_rest_route(
-            $this->namespace,
             '/check_gift_code',
             array(
                 'methods' => 'POST',
@@ -65,29 +56,6 @@ class POC_Chatbot_API
                 'callback' => array( $this, 'create_gift_checkout_link' )
             )
         );
-    }
-
-    public function redirect_to_block( $request )
-    {
-        $this->validate_request( $request );
-
-        $params = $request->get_json_params();
-
-        if( ! isset( $params['block'] ) || ! isset( $params['client_id'] ) ) {
-            return $this->error_response();
-        }
-
-        $response = $this->send_chatbot_api_request( $params['client_id'], array(
-            'redirect_to_blocks' => array(
-                $params['block']
-            )
-        ) );
-
-        if( ! $this->parse_chatbot_api_response( $response ) ) {
-            return $this->error_response();
-        }
-
-        return $this->success_response();
     }
 
     /**
