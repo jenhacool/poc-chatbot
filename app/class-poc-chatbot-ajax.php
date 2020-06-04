@@ -99,6 +99,30 @@ class POC_Chatbot_AJAX
             wp_send_json_error();
         }
 
+        $attributes = array();
+
+        foreach ( $data['attributes'] as $name => $attr ) {
+            if( empty( $attr ) ) {
+                continue;
+            }
+
+            $name = 'attribute_' . sanitize_title( $name );
+            $attributes[$name] = $attr;
+        }
+
+        $variation_id = null;
+
+        if( ! empty( $attributes ) ) {
+            $variation_id = (new \WC_Product_Data_Store_CPT())->find_matching_product_variation(
+                $product,
+                $attributes
+            );
+        }
+
+        if( $variation_id ) {
+            $product = new \WC_Product_Variable( $variation_id );
+        }
+
         $order->add_product( $product, 1 );
 
         foreach($order->get_items() as $order_item){

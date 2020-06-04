@@ -121,7 +121,7 @@ class WC_Helper_Product {
         $attributes[] = $attribute;
 
         $attribute      = new \WC_Product_Attribute();
-        $attribute_data = self::create_attribute( 'colour', array( 'red', 'blue' ) );
+        $attribute_data = self::create_attribute( 'color', array( 'red', 'blue' ) );
         $attribute->set_id( $attribute_data['attribute_id'] );
         $attribute->set_name( $attribute_data['attribute_taxonomy'] );
         $attribute->set_options( $attribute_data['term_ids'] );
@@ -176,7 +176,7 @@ class WC_Helper_Product {
         $variation_3->set_attributes(
             array(
                 'pa_size'   => 'huge',
-                'pa_colour' => 'red',
+                'pa_color' => 'red',
                 'pa_number' => '0',
             )
         );
@@ -193,7 +193,7 @@ class WC_Helper_Product {
         $variation_4->set_attributes(
             array(
                 'pa_size'   => 'huge',
-                'pa_colour' => 'red',
+                'pa_color' => 'red',
                 'pa_number' => '2',
             )
         );

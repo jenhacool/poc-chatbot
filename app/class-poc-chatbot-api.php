@@ -56,6 +56,15 @@ class POC_Chatbot_API
                 'callback' => array( $this, 'create_gift_checkout_link' )
             )
         );
+
+        register_rest_route(
+            $this->namespace,
+            '/get_attribute_options',
+            array(
+                'methods' => 'POST',
+                'callback' => array( $this, 'get_attribute_options' )
+            )
+        );
     }
 
     /**
@@ -235,12 +244,32 @@ class POC_Chatbot_API
 
         $url = rtrim( $data['link'], '/' ) . '/?customer_key=' . $transient_key;
 
-        return $this->success_response( array(
+        $response_data = array(
             'wincode' => $params['wincode'],
             'discount' => $wincode_setting['discount'],
-            'product' => wc_get_product( $wincode_setting['product_id'] )->get_title(),
-            'sale_page' => $url
-        ) );
+            'product' => '',
+            'attributes' => array()
+        );
+
+        $product = wc_get_product( $wincode_setting['product_id'] );
+
+        $response_data['product'] = $product->get_title();
+
+        $attributes = $product->get_attributes();
+
+        foreach ( $attributes as $attribute ) {
+            $options = array();
+
+            $terms = $attribute->get_terms();
+
+            foreach ($terms as $term) {
+                $options[$term->slug] = $term->name;
+            }
+
+            $response_data['attributes'][$attribute->get_taxonomy()] = $options;
+        }
+
+        return $this->success_response( $response_data );
     }
 
     /**
@@ -253,10 +282,6 @@ class POC_Chatbot_API
     public function get_sale_page( $request )
     {
         $params = $request->get_json_params();
-
-        $data = array(
-            'client_id' => $params['client_id']
-        );
 
         $settings = unserialize( get_option( 'poc_chatbot_settings' ) );
 
@@ -273,42 +298,65 @@ class POC_Chatbot_API
             return $this->error_response();
         }
 
-        $data = array_merge( $data, $wincode_setting );
+        $data = array_merge( array(
+            'client_id' => '',
+            'wincode' => '',
+            'attributes' => '',
+        ), $params );
 
         $transient_key = wp_generate_password( 13, false );
 
         set_transient( $transient_key, $data, HOUR_IN_SECONDS );
 
-        $url = rtrim( $data['link'], '/' ) . '/?customer_key=' . $transient_key;
+        $url = rtrim( $wincode_setting['link'], '/' ) . '/?customer_key=' . $transient_key;
 
-        $body = array(
-            'messages' => array(
-                array(
-                    'attachment' => array(
-                        'type' => 'template',
-                        'payload' => array(
-                            'template_type' => 'button',
-                            'text' => 'Xin chúc mừng. Anh/chị đã nhận được mã giảm giá ' . $wincode_setting['discount'] . '% cho sản phẩm \'' . wc_get_product( $wincode_setting['product_id'] )->get_title() . '\'',
-                            'buttons' => array(
-                                array(
-                                    'type' => 'web_url',
-                                    'url' => $url,
-                                    'title' => 'Mua ngay'
-                                )
-                            )
-                        )
-                    )
-                )
-            )
-        );
+        return $this->success_response( array(
+            'sale_page' => $url
+        ) );
+    }
 
-        $response = $this->send_chatbot_api_request( $params['client_id'], $body );
+    public function get_attribute_options( $request )
+    {
+        $params = $request->get_json_params();
 
-        if( ! $this->parse_chatbot_api_response( $response ) ) {
+        if( ! isset( $params['product_id'] ) || ! isset( $params['attribute'] ) ) {
             return $this->error_response();
         }
 
-        return $this->success_response();
+        $attribute_name = 'pa_' . $params['attribute'];
+
+        $product = wc_get_product( $params['product_id'] );
+
+        if( ! $product ) {
+            return $this->error_response();
+        }
+
+        $attributes = $product->get_attributes();
+
+        if( empty( $attributes ) ) {
+            return $this->success_response( array() );
+        }
+
+        $attribute = null;
+
+        $options = array();
+
+        foreach( $attributes as $attr ) {
+            if( $attr->get_taxonomy() === $attribute_name ) {
+                $attribute = $attr;
+                break;
+            }
+
+            continue;
+        }
+
+        $terms = $attribute->get_terms();
+
+        foreach( $terms as $term ) {
+            $options[$term->slug] = $term->name;
+        }
+
+        return $this->success_response( $options );
     }
 
     /**

@@ -21,6 +21,7 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
         '/poc-chatbot/v1/get_gift_link',
         '/poc-chatbot/v1/wincode_info',
         '/poc-chatbot/v1/get_sale_page',
+        '/poc-chatbot/v1/get_attribute_options'
     );
 
     public function setUp()
@@ -176,20 +177,22 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
         $this->assertEquals( 'TEST', $wincode_info['wincode'] );
         $this->assertEquals( 10, $wincode_info['discount'] );
         $this->assertEquals( $this->product->get_title(), $wincode_info['product'] );
-
-        $sale_page = $wincode_info['sale_page'];
-
-        $transient_key = str_replace( 'http://example.com/?customer_key=', '', $sale_page );
-
-        $transient_data = get_transient( $transient_key );
-
         $this->assertEquals( array(
-            'client_id' => '2980042722091199',
-            'wincode' => 'TEST',
-            'product_id' => $this->product->get_id(),
-            'discount' => 10,
-            'link' => 'http://example.com'
-        ), $transient_data );
+            'pa_size' => array(
+                'small' => 'small',
+                'large' => 'large',
+                'huge' => 'huge',
+            ),
+            'pa_color' => array(
+                'red' => 'red',
+                'blue' => 'blue',
+            ),
+            'pa_number' => array(
+                '0' => '0',
+                '1' => '1',
+                '2' => '2',
+            )
+        ), $wincode_info['attributes'] );
     }
 
     public function test_get_sale_page()
@@ -207,18 +210,54 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
 
         update_option( 'poc_chatbot_settings', serialize( $settings ) );
 
-        $body_params = array(
+        $request = $this->create_new_request( array(
             'wincode' => 'TEST',
-            'client_id' => '2980042722091199'
-        );
-
-        $request = new \WP_REST_Request();
-
-        $request->set_body_params( $body_params );
+            'client_id' => '2980042722091199',
+            'attributes' => array(
+                'pa_color' => 'red',
+                'pa_size' => 'small',
+            )
+        ) );
 
         $response = $this->api->get_sale_page( $request );
 
-        $this->assert_success_response( $response, array() );
+        $this->assertSame( 200, $response->get_status() );
+
+        $response_data = $response->get_data();
+
+        $this->assertTrue( $response_data['success'] );
+        $this->assertArrayHasKey( 'sale_page', $response_data['data'] );
+
+        $sale_page = $response_data['data']['sale_page'];
+
+        $transient_key = str_replace( 'http://example.com/?customer_key=', '', $sale_page );
+
+        $transient_data = get_transient( $transient_key );
+
+        $this->assertEquals( array(
+            'client_id' => '2980042722091199',
+            'wincode' => 'TEST',
+            'attributes' => array(
+                'pa_color' => 'red',
+                'pa_size' => 'small',
+            )
+        ), $transient_data );
+    }
+
+    public function test_get_attribute_options()
+    {
+        $request = $this->create_new_request( array(
+            'product_id' => $this->product->get_id(),
+            'attribute' => 'size'
+        ) );
+
+        $response = $this->api->get_attribute_options( $request );
+
+        $this->assert_success_response( $response, array(
+            'small' => 'small',
+            'large' => 'large',
+            'huge' => 'huge',
+        ) );
     }
 
     /**
