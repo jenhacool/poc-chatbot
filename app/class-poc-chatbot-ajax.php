@@ -46,6 +46,12 @@ class POC_Chatbot_AJAX
 
         $order->save();
 
+        foreach($order->get_items() as $order_item){
+            $order_item->set_subtotal(0);
+            $order_item->set_total(0);
+            $order_item->save();
+        }
+
         $this->delete_transient( $_POST['transient_key'] );
 
         wp_send_json_success();
@@ -114,13 +120,13 @@ class POC_Chatbot_AJAX
 
         if( ! empty( $attributes ) ) {
             $variation_id = (new \WC_Product_Data_Store_CPT())->find_matching_product_variation(
-                $product,
+                new \WC_Product_Variable( $wincode_setting['product_id'] ),
                 $attributes
             );
         }
 
         if( $variation_id ) {
-            $product = new \WC_Product_Variable( $variation_id );
+            $product = new \WC_Product_Variation( $variation_id );
         }
 
         $order->add_product( $product, 1 );
