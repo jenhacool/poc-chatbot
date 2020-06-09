@@ -38,6 +38,15 @@ class POC_Chatbot_API
                 'callback' => array( $this, 'get_sale_page' )
             )
         );
+
+        register_rest_route(
+            $this->namespace,
+            '/match_order',
+            array(
+                'methods' => 'POST',
+                'callback' => array( $this, 'match_order' )
+            )
+        );
     }
 
     /**
