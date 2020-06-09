@@ -23,6 +23,15 @@ class POC_Chatbot_API
 
         register_rest_route(
             $this->namespace,
+            '/get_gift_link',
+            array(
+                'methods' => 'POST',
+                'callback' => array( $this, 'get_gift_link' )
+            )
+        );
+
+        register_rest_route(
+            $this->namespace,
             '/wincode_info',
             array(
                 'methods' => 'POST',
@@ -90,6 +99,41 @@ class POC_Chatbot_API
 
         return $this->success_response( array(
             'is_correct' => true
+        ) );
+    }
+
+    /**
+     * Get gift link
+     *
+     * @param \WP_REST_Request $request
+     *
+     * @return \WP_REST_Response
+     */
+    public function get_gift_link( $request )
+    {
+        $data = array(
+            'first_name' => '',
+            'last_name' => '',
+            'phone_number' => '',
+            'email' => '',
+            'gift_code' => '',
+            'product_id' => '',
+            'client_id' => '',
+            'messenger_url' => ''
+        );
+
+        $params = $request->get_json_params();
+
+        $transient_data = array_merge( $data, $params );
+
+        $transient_key = wp_generate_password( 13, false );
+
+        set_transient( $transient_key, $transient_data, DAY_IN_SECONDS );
+
+        $url = rtrim( get_home_url(), '/' ) . '/poc-gift/' . $transient_key;
+
+        return $this->success_response( array(
+            'link' => $url
         ) );
     }
 
