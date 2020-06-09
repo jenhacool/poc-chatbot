@@ -96,6 +96,14 @@ class Test_Class_POC_Chatbot extends \WP_UnitTestCase
                 array( $this->instance, 'add_scripts' )
             )
         );
+
+        $this->assertGreaterThan(
+            0,
+            has_action(
+                'rest_pre_serve_request',
+                array( $this->instance, 'add_cors_http_header' )
+            )
+        );
     }
 
     public function test_add_rewrite_rules()

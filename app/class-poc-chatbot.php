@@ -60,6 +60,11 @@ class POC_Chatbot
         add_action( 'wp_ajax_nopriv_poc_chatbot_match_order', array( $this->ajax, 'match_order' ) );
 
         add_action( 'wp_enqueue_scripts', array( $this, 'add_scripts' ) );
+
+        add_filter( 'rest_pre_serve_request', function() {
+            header( 'Access-Control-Allow-Origin: *' );
+            header( 'Access-Control-Allow-Headers: X-POC-Access-Token', false );
+        } );
     }
 
     /**
