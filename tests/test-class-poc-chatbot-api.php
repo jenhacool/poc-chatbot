@@ -19,6 +19,7 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
         '/poc-chatbot/v1/check_gift_code',
         '/poc-chatbot/v1/wincode_info',
         '/poc-chatbot/v1/get_sale_page',
+        '/poc-chatbot/v1/match_order'
     );
 
     public function setUp()
@@ -189,6 +190,51 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
                 'pa_size' => 'small',
             )
         ), $transient_data );
+    }
+
+    public function test_match_order()
+    {
+        $settings = array(
+        'wincodes' => array(
+            array(
+                'wincode' => 'OFF50',
+                'product_id' => $this->product->get_id(),
+                'discount' => 50,
+                'link' => 'http://example.com'
+            )
+        )
+    );
+
+        update_option( 'poc_chatbot_settings', serialize( $settings ) );
+
+        $customer_key = wp_generate_password( 13, false );
+
+        set_transient(
+            $customer_key,
+            array(
+                'client_id' => '872807819873162',
+                'wincode' => 'OFF50',
+                'attributes' => array(
+                    'pa_size'   => 'huge',
+                    'pa_color' => 'red',
+                    'pa_number' => '0',
+                )
+            )
+        );
+
+        $order = wc_create_order();
+        $order->add_meta_data( 'fb_client_id', '872807819873162' );
+        $order->save();
+
+        $request = $this->create_new_request( array(
+            'customer_key' => $customer_key,
+        ) );
+
+        $response = $this->api->match_order( $request );
+
+        $this->assertEquals( '8.00', wc_get_order( $order->get_id() )->get_total() );
+
+        $this->assert_success_response( $response, array() );
     }
 
     /**

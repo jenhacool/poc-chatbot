@@ -194,6 +194,120 @@ class POC_Chatbot_API
     }
 
     /**
+     * Match order
+     *
+     * @param \WP_REST_Request $request
+     *
+     * @return \WP_REST_Response
+     * @throws \WC_Data_Exception
+     */
+    public function match_order( $request )
+    {
+        global $wpdb;
+
+        $params = $request->get_json_params();
+
+        if( ! isset( $params['customer_key'] ) ) {
+            return $this->error_response();
+        }
+
+        $data = get_transient( $params['customer_key'] );
+
+        if( ! $data ) {
+            return $this->error_response();
+        }
+
+        $settings = unserialize( get_option( 'poc_chatbot_settings' ) );
+
+        $wincode_setting = null;
+
+        foreach( $settings['wincodes'] as $wincode ) {
+            if( $wincode['wincode'] === $data['wincode'] ) {
+                $wincode_setting = $wincode;
+                break;
+            }
+        }
+
+        if( is_null( $wincode_setting ) ) {
+            return $this->error_response();
+        }
+
+        $client_id = $data['client_id'];
+
+        $results = $wpdb->get_results(
+            "select post_id, meta_key from $wpdb->postmeta where meta_value = '$client_id' ORDER BY post_id DESC LIMIT 1",
+            ARRAY_A
+        );
+
+        $order = wc_get_order( $results[0]['post_id'] );
+
+        if( ! $order ) {
+            return $this->error_response();
+        }
+
+        $product = wc_get_product( $wincode_setting['product_id'] );
+
+        if( ! $product ) {
+            return $this->error_response();
+        }
+
+        $attributes = array();
+
+        foreach ( $data['attributes'] as $name => $attr ) {
+            $name = 'attribute_' . sanitize_title( $name );
+            $attributes[$name] = $attr;
+        }
+
+        $variation_id = null;
+
+        if( ! empty( $attributes ) ) {
+            $variation_id = (new \WC_Product_Data_Store_CPT())->find_matching_product_variation(
+                new \WC_Product_Variable( $wincode_setting['product_id'] ),
+                $attributes
+            );
+        }
+
+        if( $variation_id ) {
+            $product = new \WC_Product_Variation( $variation_id );
+        }
+
+        $order->add_product( $product, 1 );
+
+        foreach( $order->get_items() as $order_item ){
+            if( $order_item->get_product_id() != $wincode_setting['product_id'] ) {
+                continue;
+            }
+
+            $total = $order_item->get_total();
+            $order_item->set_subtotal($total);
+            $discount_total = (float) ( $total * ( $wincode_setting['discount'] / 100 ) );
+
+            $order_item->set_total($total - $discount_total);
+            $order_item->save();
+        }
+
+        $item = new \WC_Order_Item_Coupon();
+
+        $item->set_props(
+            array(
+                'code' => $wincode_setting['wincode'],
+                'discount' => $wincode_setting['discount'],
+                'discount_tax' => 0
+            )
+        );
+
+        $order->add_item( $item );
+
+        $order->calculate_totals();
+
+        $order->save();
+
+        $this->delete_transient( $params['customer_key'] );
+
+        return $this->success_response();
+    }
+
+    /**
      * Validate request
      *
      * @param \WP_REST_Request $request
@@ -312,5 +426,15 @@ class POC_Chatbot_API
             'data' => $data,
             'success' => false
         ), 400 );
+    }
+
+    /**
+     * Delete transient
+     *
+     * @param $transient_key
+     */
+    protected function delete_transient( $transient_key )
+    {
+        delete_transient( $transient_key );
     }
 }
