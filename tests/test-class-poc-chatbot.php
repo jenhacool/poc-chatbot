@@ -76,30 +76,6 @@ class Test_Class_POC_Chatbot extends \WP_UnitTestCase
         $this->assertGreaterThan(
             0,
             has_action(
-                'wp_ajax_poc_chatbot_match_order',
-                array( $this->instance->ajax, 'match_order' )
-            )
-        );
-
-        $this->assertGreaterThan(
-            0,
-            has_action(
-                'wp_ajax_nopriv_poc_chatbot_match_order',
-                array( $this->instance->ajax, 'match_order' )
-            )
-        );
-
-        $this->assertGreaterThan(
-            0,
-            has_action(
-                'wp_enqueue_scripts',
-                array( $this->instance, 'add_scripts' )
-            )
-        );
-
-        $this->assertGreaterThan(
-            0,
-            has_action(
                 'rest_pre_serve_request',
                 array( $this->instance, 'add_cors_http_header' )
             )

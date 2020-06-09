@@ -55,12 +55,6 @@ class POC_Chatbot
 
         add_action( 'wp_ajax_nopriv_poc_chatbot_get_gift', array( $this->ajax, 'get_gift' ) );
 
-        add_action( 'wp_ajax_poc_chatbot_match_order', array( $this->ajax, 'match_order' ) );
-
-        add_action( 'wp_ajax_nopriv_poc_chatbot_match_order', array( $this->ajax, 'match_order' ) );
-
-        add_action( 'wp_enqueue_scripts', array( $this, 'add_scripts' ) );
-
         add_filter( 'rest_pre_serve_request', function() {
             header( 'Access-Control-Allow-Origin: *' );
             header( 'Access-Control-Allow-Headers: X-POC-Access-Token', false );
@@ -103,19 +97,6 @@ class POC_Chatbot
         }
 
         return $original_template;
-    }
-
-    /**
-     * Add needed scripts
-     */
-    public function add_scripts()
-    {
-        wp_enqueue_script( 'poc_chatbot', POC_CHATBOT_PLUGIN_URL . 'assets/script.js', array( 'jquery' ) );
-        wp_localize_script( 'poc_chatbot', 'poc_chatbot_data',
-            array(
-                'ajax_url' => admin_url( 'admin-ajax.php' )
-            )
-        );
     }
 
     /**
