@@ -23,15 +23,6 @@ class POC_Chatbot_API
 
         register_rest_route(
             $this->namespace,
-            '/get_gift_link',
-            array(
-                'methods' => 'POST',
-                'callback' => array( $this, 'get_gift_link' )
-            )
-        );
-
-        register_rest_route(
-            $this->namespace,
             '/wincode_info',
             array(
                 'methods' => 'POST',
@@ -45,24 +36,6 @@ class POC_Chatbot_API
             array(
                 'methods' => 'POST',
                 'callback' => array( $this, 'get_sale_page' )
-            )
-        );
-
-        register_rest_route(
-            $this->namespace,
-            '/gift_checkout_link',
-            array(
-                'methods' => 'POST',
-                'callback' => array( $this, 'create_gift_checkout_link' )
-            )
-        );
-
-        register_rest_route(
-            $this->namespace,
-            '/get_attribute_options',
-            array(
-                'methods' => 'POST',
-                'callback' => array( $this, 'get_attribute_options' )
             )
         );
     }
@@ -108,101 +81,6 @@ class POC_Chatbot_API
 
         return $this->success_response( array(
             'is_correct' => true
-        ) );
-    }
-
-    /**
-     * Create gift checkout link
-     *
-     * @param \WP_REST_Request $request
-     *
-     * @return \WP_REST_Response
-     */
-    public function create_gift_checkout_link( $request )
-    {
-        $data = array(
-            'first_name' => '',
-            'last_name' => '',
-            'phone_number' => '',
-            'email' => '',
-            'gift_code' => '',
-            'product_id' => '',
-            'client_id' => '',
-            'messenger_url' => ''
-        );
-
-        $params = $request->get_json_params();
-
-        $transient_data = array_merge( $data, $params );
-
-        $transient_key = wp_generate_password( 13, false );
-
-        set_transient( $transient_key, $transient_data, DAY_IN_SECONDS );
-
-        $url = rtrim( get_home_url(), '/' ) . '/poc-gift/' . $transient_key;
-
-        $body = array(
-            'messages' => array(
-                array(
-                    'attachment' => array(
-                        'type' => 'template',
-                        'payload' => array(
-                            'template_type' => 'button',
-                            'text' => 'Vui lòng truy cập đường dẫn dưới đây và hoàn thành các thông tin để nhận quà.',
-                            'buttons' => array(
-                                array(
-                                    'type' => 'web_url',
-                                    'url' => $url,
-                                    'title' => 'Nhận quà'
-                                )
-                            )
-                        )
-                    )
-                )
-            )
-        );
-
-        $response = $this->send_chatbot_api_request( $params['client_id'], $body );
-
-        if( ! $this->parse_chatbot_api_response( $response ) ) {
-            return $this->error_response();
-        }
-
-        return $this->success_response();
-    }
-
-    /**
-     * Get gift link
-     *
-     * @param \WP_REST_Request $request
-     *
-     * @return \WP_REST_Response
-     */
-    public function get_gift_link( $request )
-    {
-        $data = array(
-            'first_name' => '',
-            'last_name' => '',
-            'phone_number' => '',
-            'email' => '',
-            'gift_code' => '',
-            'product_id' => '',
-            'client_id' => '',
-            'messenger_url' => ''
-        );
-
-        $params = $request->get_json_params();
-
-        $transient_data = array_merge( $data, $params );
-
-        $transient_key = wp_generate_password( 13, false );
-
-        set_transient( $transient_key, $transient_data, DAY_IN_SECONDS );
-
-        $url = rtrim( get_home_url(), '/' ) . '/poc-gift/' . $transient_key;
-
-        return $this->success_response( array(
-            'link' => $url
         ) );
     }
 
@@ -313,50 +191,6 @@ class POC_Chatbot_API
         return $this->success_response( array(
             'sale_page' => $url
         ) );
-    }
-
-    public function get_attribute_options( $request )
-    {
-        $params = $request->get_json_params();
-
-        if( ! isset( $params['product_id'] ) || ! isset( $params['attribute'] ) ) {
-            return $this->error_response();
-        }
-
-        $attribute_name = 'pa_' . $params['attribute'];
-
-        $product = wc_get_product( $params['product_id'] );
-
-        if( ! $product ) {
-            return $this->error_response();
-        }
-
-        $attributes = $product->get_attributes();
-
-        if( empty( $attributes ) ) {
-            return $this->success_response( array() );
-        }
-
-        $attribute = null;
-
-        $options = array();
-
-        foreach( $attributes as $attr ) {
-            if( $attr->get_taxonomy() === $attribute_name ) {
-                $attribute = $attr;
-                break;
-            }
-
-            continue;
-        }
-
-        $terms = $attribute->get_terms();
-
-        foreach( $terms as $term ) {
-            $options[$term->slug] = $term->name;
-        }
-
-        return $this->success_response( $options );
     }
 
     /**

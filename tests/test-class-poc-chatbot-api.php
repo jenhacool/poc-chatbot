@@ -17,11 +17,8 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
 
     public $routes = array(
         '/poc-chatbot/v1/check_gift_code',
-        '/poc-chatbot/v1/gift_checkout_link',
-        '/poc-chatbot/v1/get_gift_link',
         '/poc-chatbot/v1/wincode_info',
         '/poc-chatbot/v1/get_sale_page',
-        '/poc-chatbot/v1/get_attribute_options'
     );
 
     public function setUp()
@@ -93,56 +90,6 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
         $this->assert_error_response( $response, array(
             'is_correct' => false
         ) );
-    }
-
-    public function test_create_gift_checkout_link()
-    {
-        $request = $this->create_new_request( array(
-            'first_name' => 'Tien',
-            'last_name' => 'Nguyen',
-            'phone_number' => '0788338370',
-            'email' => 'mrtienhp97@gmail.com',
-            'gift_code' => 'haiyenhy',
-            'product_id' => 11,
-            'client_id' => '2980042722091199',
-            'messenger_url' => 'https://m.me/492974120811420'
-        ) );
-
-        $response = $this->api->create_gift_checkout_link( $request );
-
-        $this->assert_success_response( $response, array() );
-    }
-
-    public function test_get_gift_link()
-    {
-        $data = array(
-            'first_name' => 'Tien',
-            'last_name' => 'Nguyen',
-            'phone_number' => '0788338370',
-            'email' => 'mrtienhp97@gmail.com',
-            'gift_code' => 'haiyenhy',
-            'product_id' => 11,
-            'client_id' => '2980042722091199',
-            'messenger_url' => 'https://m.me/492974120811420'
-        );
-
-        $request = $this->create_new_request( $data );
-
-        $response = $this->api->get_gift_link( $request );
-
-        $this->assertSame( 200, $response->get_status() );
-
-        $response_data = $response->get_data();
-
-        $this->assertTrue( $response_data['success'] );
-
-        $link = $response_data['data']['link'];
-
-        $transient_key = str_replace( rtrim( get_home_url(), '/' ) . '/poc-gift/', '', $link );
-
-        $transient_data = get_transient( $transient_key );
-
-        $this->assertEquals( $data, $transient_data );
     }
 
     public function test_get_wincode_info()
@@ -242,22 +189,6 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
                 'pa_size' => 'small',
             )
         ), $transient_data );
-    }
-
-    public function test_get_attribute_options()
-    {
-        $request = $this->create_new_request( array(
-            'product_id' => $this->product->get_id(),
-            'attribute' => 'size'
-        ) );
-
-        $response = $this->api->get_attribute_options( $request );
-
-        $this->assert_success_response( $response, array(
-            'small' => 'small',
-            'large' => 'large',
-            'huge' => 'huge',
-        ) );
     }
 
     /**
