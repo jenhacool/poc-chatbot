@@ -14,6 +14,15 @@ class POC_Chatbot_API
     {
         register_rest_route(
             $this->namespace,
+            '/get_attributes_test',
+            array(
+                'methods' => 'POST',
+                'callback' => array( $this,' get_attributes_test' )
+            )
+        );
+
+        register_rest_route(
+            $this->namespace,
             '/check_gift_code',
             array(
                 'methods' => 'POST',
@@ -50,12 +59,29 @@ class POC_Chatbot_API
 
         register_rest_route(
             $this->namespace,
+            '/get_product_attributes',
+            array(
+                'methods' => 'POST',
+                'callback' => array( $this, 'get_product_attributes' )
+            )
+        );
+
+        register_rest_route(
+            $this->namespace,
             '/match_order',
             array(
                 'methods' => 'POST',
                 'callback' => array( $this, 'match_order' )
             )
         );
+    }
+
+    public function get_attributes_test( $request )
+    {
+        return $this->success_response( array(
+            'red' => 'Màu đỏ',
+            'blue' => 'Màu xanh'
+        ) );
     }
 
     /**
@@ -244,6 +270,84 @@ class POC_Chatbot_API
         return $this->success_response( array(
             'sale_page' => $url
         ) );
+    }
+
+    public function get_product_attributes( $request )
+    {
+        $params = $request->get_json_params();
+
+        $product = wc_get_product( $params['product_id'] );
+
+        $prev_attr = ( isset( $params['prev_attr'] ) ) ? $params['prev_attr'] : '';
+
+        $prev_value = ( isset( $params['prev_value'] ) ) ? $params['prev_value'] : '';
+
+        $attributes = $product->get_attributes();
+
+        // If previous attribute is last attribute, redirect to next block
+        if( $prev_attr === end( $attributes )->get_name() ) {
+            $response = $this->send_chatbot_api_request( $params['client_id'], array(
+                'redirect_to_block' => $this->get_order_success_block()
+            ) );
+
+            if( ! $this->parse_chatbot_api_response( $response ) ) {
+                return $this->error_response();
+            }
+
+            return $this->success_response();
+        }
+
+        $attribute_values = array();
+
+        foreach ( $attributes as $index => $attribute ) {
+            if( $prev_attr === $attribute->get_name() ) {
+                continue;
+            }
+
+            $attribute_values = $attribute->get_terms();
+            break;
+        }
+
+        $quick_replies = array();
+
+        foreach ( $attribute_values as $attribute_value ) {
+            $attributes_data = array();
+
+            if( $prev_attr != 'no value' && $prev_value != 'no value' ) {
+                $attributes_data[$prev_attr] = $prev_value;
+            }
+
+            $attributes_data[$attribute_value->taxonomy] = $attribute_value->slug;
+
+            $quick_reply = array(
+                'title' => $attribute_value->name,
+                'set_attributes' => array(
+                    'prev_attr' => $attribute_value->taxonomy,
+                    'prev_value' => $attribute_value->slug,
+                    'attributes' => json_encode( $attributes_data )
+                ),
+                'block_names' => array(
+                    $this->get_select_attributes_block_name()
+                ),
+            );
+
+            $quick_replies[] = $quick_reply;
+        }
+
+        $response = $this->send_chatbot_api_request( $params['client_id'], array(
+            'messages' => array(
+                array(
+                    'text' => 'Vui lòng chọn ' . wc_attribute_label( $attribute_value->taxonomy ),
+                    'quick_replies' => $quick_replies
+                )
+            )
+        ) );
+
+        if( ! $this->parse_chatbot_api_response( $response ) ) {
+            return $this->error_response();
+        }
+
+        return $this->success_response();
     }
 
     /**
@@ -489,5 +593,15 @@ class POC_Chatbot_API
     protected function delete_transient( $transient_key )
     {
         delete_transient( $transient_key );
+    }
+
+    protected function get_select_attributes_block_name()
+    {
+        return '5edf5566525b7a0012d6c9e6';
+    }
+
+    protected function get_order_success_block()
+    {
+        return '5edf3117df64940012fcfada';
     }
 }
