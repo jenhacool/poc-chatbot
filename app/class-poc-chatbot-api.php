@@ -397,19 +397,12 @@ class POC_Chatbot_API
             return $this->error_response();
         }
 
-        $attributes = array();
-
-        foreach ( $params['attributes'] as $name => $attr ) {
-            $name = 'attribute_' . sanitize_title( $name );
-            $attributes[$name] = $attr;
-        }
-
         $variation_id = null;
 
-        if( ! empty( $attributes ) ) {
+        if( ! empty( $params['attributes'] ) ) {
             $variation_id = (new \WC_Product_Data_Store_CPT())->find_matching_product_variation(
                 new \WC_Product_Variable( $wincode_setting['product_id'] ),
-                $attributes
+                $params['attributes']
             );
         }
 
