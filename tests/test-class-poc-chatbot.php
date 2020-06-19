@@ -75,9 +75,9 @@ class Test_Class_POC_Chatbot extends \WP_UnitTestCase
 
         $this->assertGreaterThan(
             0,
-            has_action(
+            has_filter(
                 'rest_pre_serve_request',
-                array( $this->instance, 'add_cors_http_header' )
+                array( $this->instance, 'add_cors_http_headers' )
             )
         );
     }
@@ -89,7 +89,7 @@ class Test_Class_POC_Chatbot extends \WP_UnitTestCase
         $this->instance->add_rewrite_rules();
 
         $this->assertArrayHasKey( 'poc-gift/([^/]+)', $wp_rewrite->extra_rules_top );
-        $this->assertSame( 'index.php?page=poc_get_gift&customer_key=$matches[1]', $wp_rewrite->extra_rules_top['poc-gift/([^/]+)'] );
+        $this->assertSame( 'index.php?pagename=poc_get_gift&customer_key=$matches[1]', $wp_rewrite->extra_rules_top['poc-gift/([^/]+)'] );
     }
 
     public function test_add_query_vars()
@@ -107,7 +107,7 @@ class Test_Class_POC_Chatbot extends \WP_UnitTestCase
 
         $this->assertEquals( 'original_template', $template );
 
-        set_query_var( 'page', 'poc_get_gift' );
+        set_query_var( 'pagename', 'poc_get_gift' );
         set_query_var( 'customer_key', 'test_customer_key' );
 
         $template = $this->instance->include_template( 'original_template' );

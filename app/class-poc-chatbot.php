@@ -55,10 +55,23 @@ class POC_Chatbot
 
         add_action( 'wp_ajax_nopriv_poc_chatbot_get_gift', array( $this->ajax, 'get_gift' ) );
 
-        add_filter( 'rest_pre_serve_request', function() {
-            header( 'Access-Control-Allow-Origin: *' );
-            header( 'Access-Control-Allow-Headers: X-POC-Access-Token', false );
-        } );
+        add_filter( 'rest_pre_serve_request', array( $this, 'add_cors_http_headers' ) );
+
+//        add_action( 'admin_init', function() {
+//
+//	        $customer_key = wp_generate_password( 13, false );
+//
+//	        set_transient(
+//		        $customer_key,
+//		        array(
+//			        'client_id' => '2980042722091199 ',
+//			        'wincode' => 'OFF50'
+//		        ),
+//		        10000
+//	        );
+//
+//	        wp_die($customer_key);
+//        } );
     }
 
     /**
@@ -97,6 +110,15 @@ class POC_Chatbot
         }
 
         return $original_template;
+    }
+
+	/**
+	 * Add CORS HTTP Header
+	 */
+    public function add_cors_http_headers()
+    {
+	    header( 'Access-Control-Allow-Origin: *' );
+	    header( 'Access-Control-Allow-Headers: X-POC-Access-Token', false );
     }
 
     /**

@@ -20,7 +20,7 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
         '/poc-chatbot/v1/get_gift_link',
         '/poc-chatbot/v1/wincode_info',
         '/poc-chatbot/v1/get_sale_page',
-        '/poc-chatbot/v1/get_product_attributes',
+        '/poc-chatbot/v1/customer_info',
         '/poc-chatbot/v1/match_order'
     );
 
@@ -159,22 +159,6 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
         $this->assertEquals( 'TEST', $wincode_info['wincode'] );
         $this->assertEquals( 10, $wincode_info['discount'] );
         $this->assertEquals( $this->product->get_title(), $wincode_info['product'] );
-        $this->assertEquals( array(
-            'pa_size' => array(
-                'small' => 'small',
-                'large' => 'large',
-                'huge' => 'huge',
-            ),
-            'pa_color' => array(
-                'red' => 'red',
-                'blue' => 'blue',
-            ),
-            'pa_number' => array(
-                '0' => '0',
-                '1' => '1',
-                '2' => '2',
-            )
-        ), $wincode_info['attributes'] );
     }
 
     public function test_get_sale_page()
@@ -194,11 +178,7 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
 
         $request = $this->create_new_request( array(
             'wincode' => 'TEST',
-            'client_id' => '2980042722091199',
-            'attributes' => array(
-                'pa_color' => 'red',
-                'pa_size' => 'small',
-            )
+            'client_id' => '2980042722091199'
         ) );
 
         $response = $this->api->get_sale_page( $request );
@@ -218,165 +198,166 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
 
         $this->assertEquals( array(
             'client_id' => '2980042722091199',
-            'wincode' => 'TEST',
-            'attributes' => array(
-                'pa_color' => 'red',
-                'pa_size' => 'small',
-            )
+            'wincode' => 'TEST'
         ), $transient_data );
     }
 
-    public function test_get_product_attributes()
+    public function test_get_customer_info()
     {
-        $request = $this->create_new_request( array(
-            'client_id' => '2980042722091199',
-            'product_id' => $this->product->get_id(),
-            'prev_attr' => 'no value',
-            'prev_value' => 'no value'
-        ) );
+	    $settings = array(
+		    'wincodes' => array(
+			    array(
+				    'wincode' => 'TEST',
+				    'product_id' => $this->product->get_id(),
+				    'discount' => 10,
+				    'link' => 'http://example.com'
+			    )
+		    )
+	    );
 
-        $api = $this->getMockBuilder( POC_Chatbot_API::class )->setMethods( array( 'send_chatbot_api_request', 'get_select_attributes_block_name', 'parse_chatbot_api_response' ) )->getMock();
+	    update_option( 'poc_chatbot_settings', serialize( $settings ) );
 
-        $api->expects( $this->any() )->method( 'get_select_attributes_block_name' )->willReturn( 'block_select_attributes' );
+	    $this->product->set_image_id( 1 );
+	    $this->product->save();
 
-        $api->expects( $this->any() )->method( 'parse_chatbot_api_response' )->willReturn( true );
+	    $data = array(
+		    'client_id' => '872807819873162',
+		    'coupon' => array(
+			    'code' => 'TEST',
+			    'discount' => 10
+		    ),
+		    'product' => array(
+			    'id' => $this->product->get_id(),
+			    'title' => $this->product->get_title(),
+			    'image' => 'image_url',
+			    'currency_format' => 'left',
+			    'currency_symbol' => '&pound;',
+			    'attributes' => array(
+				    array(
+					    'name' => 'size',
+					    'slug' => 'pa_size',
+					    'terms' => array(
+						    array(
+							    'name' => 'small',
+							    'slug' => 'small'
+						    ),
+						    array(
+							    'name' => 'large',
+							    'slug' => 'large'
+						    ),
+						    array(
+							    'name' => 'huge',
+							    'slug' => 'huge'
+						    ),
+					    ),
+				    ),
+				    array(
+					    'name' => 'color',
+					    'slug' => 'pa_color',
+					    'terms' => array(
+						    array(
+							    'name' => 'red',
+							    'slug' => 'red'
+						    ),
+						    array(
+							    'name' => 'blue',
+							    'slug' => 'blue'
+						    )
+					    )
+				    ),
+				    array(
+					    'name' => 'number',
+					    'slug' => 'pa_number',
+					    'terms' => array(
+						    array(
+							    'name' => '2',
+							    'slug' => '2'
+						    ),
+						    array(
+							    'name' => '1',
+							    'slug' => '1'
+						    ),
+						    array(
+							    'name' => '0',
+							    'slug' => '0'
+						    ),
+					    )
+				    )
+			    ),
+			    'variations' => array(
+				    array(
+					    'regular_price' => 10.00,
+					    'attributes' => array(
+						    'attribute_pa_size' => 'small',
+						    'attribute_pa_color' => '',
+						    'attribute_pa_number' => ''
+					    )
+				    ),
+				    array(
+					    'regular_price' => 15.00,
+					    'attributes' => array(
+						    'attribute_pa_size' => 'large',
+						    'attribute_pa_color' => '',
+						    'attribute_pa_number' => ''
+					    )
+				    ),
+				    array(
+					    'regular_price' => 16.00,
+					    'attributes' => array(
+						    'attribute_pa_size' => 'huge',
+						    'attribute_pa_color' => 'red',
+						    'attribute_pa_number' => '0'
+					    )
+				    ),
+				    array(
+					    'regular_price' => 17.00,
+					    'attributes' => array(
+						    'attribute_pa_size' => 'huge',
+						    'attribute_pa_color' => 'red',
+						    'attribute_pa_number' => '2'
+					    )
+				    )
+			    )
+		    )
+	    );
 
-        $data = array(
-            'messages' => array(
-                array(
-                    'text' => 'Vui lòng chọn size',
-                    'quick_replies' => array(
-                        array(
-                            'title' => 'huge',
-                            'block_names' => array(
-                                'block_select_attributes'
-                            ),
-                            'set_attributes' => array(
-                                'prev_attr' => 'pa_size',
-                                'prev_value' => 'huge',
-                                'attributes' => json_encode( array( 'pa_size' => 'huge' ) )
-                            )
-                        ),
-                        array(
-                            'title' => 'large',
-                            'block_names' => array(
-                                'block_select_attributes'
-                            ),
-                            'set_attributes' => array(
-                                'prev_attr' => 'pa_size',
-                                'prev_value' => 'large',
-                                'attributes' => json_encode( array( 'pa_size' => 'large' ) )
-                            )
-                        ),
-                        array(
-                            'title' => 'small',
-                            'block_names' => array(
-                                'block_select_attributes'
-                            ),
-                            'set_attributes' => array(
-                                'prev_attr' => 'pa_size',
-                                'prev_value' => 'small',
-                                'attributes' => json_encode( array( 'pa_size' => 'small' ) )
-                            )
-                        ),
-                    )
-                )
-            )
-        );
+	    $customer_key = wp_generate_password( 13, false );
 
-        $api->expects( $this->once() )->method( 'send_chatbot_api_request' )->with( '2980042722091199', $data )->willReturn( true );
+	    set_transient(
+		    $customer_key,
+		    array(
+			    'client_id' => '872807819873162',
+			    'wincode' => 'TEST'
+		    )
+	    );
 
-        $this->assert_success_response( $api->get_product_attributes( $request ), array() );
-    }
+	    $api = $this->getMockBuilder( POC_Chatbot_API::class )->setMethods( array( 'get_product_thumbnail' ) )->getMock();
 
-    public function test_get_product_attributes_with_prev_attr()
-    {
-        $request = $this->create_new_request( array(
-            'client_id' => '2980042722091199',
-            'product_id' => $this->product->get_id(),
-            'prev_attr' => 'pa_size',
-            'prev_value' => 'large'
-        ) );
+	    $api->expects( $this->any() )->method( 'get_product_thumbnail' )->with( 1 )->willReturn( 'image_url' );
 
-        $api = $this->getMockBuilder( POC_Chatbot_API::class )->setMethods( array( 'send_chatbot_api_request', 'get_select_attributes_block_name', 'parse_chatbot_api_response' ) )->getMock();
+	    $request = $this->create_new_request( array(
+	    	'customer_key' => $customer_key
+	    ) );
 
-        $api->expects( $this->any() )->method( 'get_select_attributes_block_name' )->willReturn( 'block_select_attributes' );
+	    $response = $api->get_customer_info( $request );
 
-        $api->expects( $this->any() )->method( 'parse_chatbot_api_response' )->willReturn( true );
+	    var_dump($response);
 
-        $data = array(
-            'messages' => array(
-                array(
-                    'text' => 'Vui lòng chọn color',
-                    'quick_replies' => array(
-                        array(
-                            'title' => 'blue',
-                            'block_names' => array(
-                                'block_select_attributes'
-                            ),
-                            'set_attributes' => array(
-                                'prev_attr' => 'pa_color',
-                                'prev_value' => 'blue',
-                                'attributes' => json_encode( array( 'pa_size' => 'large', 'pa_color' => 'blue' ) )
-                            )
-                        ),
-                        array(
-                            'title' => 'red',
-                            'block_names' => array(
-                                'block_select_attributes'
-                            ),
-                            'set_attributes' => array(
-                                'prev_attr' => 'pa_color',
-                                'prev_value' => 'red',
-                                'attributes' => json_encode( array( 'pa_size' => 'large', 'pa_color' => 'red' ) )
-                            )
-                        ),
-                    )
-                )
-            )
-        );
-
-        $api->expects( $this->once() )->method( 'send_chatbot_api_request' )->with( '2980042722091199', $data )->willReturn( true );
-
-        $this->assert_success_response( $api->get_product_attributes( $request ), array() );
-    }
-
-    public function test_get_product_attributes_with_prev_attr_is_last_attr()
-    {
-        $request = $this->create_new_request( array(
-            'client_id' => '2980042722091199',
-            'product_id' => $this->product->get_id(),
-            'prev_attr' => 'pa_number',
-            'prev_value' => '1'
-        ) );
-
-        $api = $this->getMockBuilder( POC_Chatbot_API::class )->setMethods( array( 'send_chatbot_api_request', 'get_order_success_block', 'parse_chatbot_api_response' ) )->getMock();
-
-        $api->expects( $this->any() )->method( 'get_order_success_block' )->willReturn( 'success_block' );
-
-        $api->expects( $this->any() )->method( 'parse_chatbot_api_response' )->willReturn( true );
-
-        $data = array(
-            'redirect_to_block' => 'success_block'
-        );
-
-        $api->expects( $this->once() )->method( 'send_chatbot_api_request' )->with( '2980042722091199', $data )->willReturn( true );
-
-        $this->assert_success_response( $api->get_product_attributes( $request ), array() );
+	    $this->assert_success_response( $response, $data );
     }
 
     public function test_match_order()
     {
         $settings = array(
-        'wincodes' => array(
-            array(
-                'wincode' => 'OFF50',
-                'product_id' => $this->product->get_id(),
-                'discount' => 50,
-                'link' => 'http://example.com'
-            )
-        )
-    );
+	        'wincodes' => array(
+	            array(
+	                'wincode' => 'OFF50',
+	                'product_id' => $this->product->get_id(),
+	                'discount' => 50,
+	                'link' => 'http://example.com'
+	            )
+	        )
+	    );
 
         update_option( 'poc_chatbot_settings', serialize( $settings ) );
 
@@ -386,12 +367,7 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
             $customer_key,
             array(
                 'client_id' => '872807819873162',
-                'wincode' => 'OFF50',
-                'attributes' => array(
-                    'pa_size'   => 'huge',
-                    'pa_color' => 'red',
-                    'pa_number' => '0',
-                )
+                'wincode' => 'OFF50'
             )
         );
 
@@ -401,11 +377,17 @@ class Test_Class_POC_Chatbot_API extends \WP_UnitTestCase
 
         $request = $this->create_new_request( array(
             'customer_key' => $customer_key,
+            'attributes' => array(
+	            'pa_size'   => 'huge',
+	            'pa_color' => 'red',
+	            'pa_number' => '0',
+            ),
+	        'quantity' => 2,
         ) );
 
         $response = $this->api->match_order( $request );
 
-        $this->assertEquals( '8.00', wc_get_order( $order->get_id() )->get_total() );
+        $this->assertEquals( '16.00', wc_get_order( $order->get_id() )->get_total() );
 
         $this->assert_success_response( $response, array() );
     }
